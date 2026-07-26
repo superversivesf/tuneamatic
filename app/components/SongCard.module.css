@@ -1,0 +1,74 @@
+.card {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: white;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prompt {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lyrics {
+  font-size: 0.85rem;
+  color: #666;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-family: ui-monospace, monospace;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: #888;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.badgePending { background: #fff3cd; color: #856404; }
+.badgeReady { background: #d4edda; color: #155724; }
+.badgeFailed { background: #f8d7da; color: #721c24; }
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.playBtn {
+  background: #0070f3;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.playBtn:hover { background: #0060d3; }
+
+.deleteBtn {
+  background: transparent;
+  color: #c0392b;
+  border: 1px solid #e0c4be;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.deleteBtn:hover { background: #f8d7da; }
