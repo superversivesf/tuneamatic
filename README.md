@@ -45,7 +45,7 @@ First run downloads models from HuggingFace (~several GB). The server starts on 
 pnpm dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:5432.
 
 ## Usage
 
@@ -67,7 +67,7 @@ pnpm build        # Production build
 
 See `docs/superpowers/specs/2026-07-26-tuneamatic-design.md` for the full design.
 
-- **Next.js** (App Router) full-stack app on `:3000`
+- **Next.js** (App Router) full-stack app on `:5432`
 - **ACE-Step 1.5** FastAPI server on `:8001` (sibling process)
 - **SQLite** (`data/tuneamatic.db`) for song metadata
 - **Background poller** (`instrumentation.ts` -> `lib/poller.ts`) drives task completion and downloads audio

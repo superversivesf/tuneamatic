@@ -11,7 +11,7 @@ beforeEach(() => {
 });
 
 function makeReq(body: any): Request {
-  return new Request("http://localhost:3000/api/generate", {
+  return new Request("http://localhost:5432/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

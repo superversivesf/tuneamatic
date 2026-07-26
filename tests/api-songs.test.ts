@@ -34,7 +34,7 @@ describe("GET /api/songs/[id]", () => {
       ditModel: "acestep-v15-sft",
       lmModel: "acestep-5Hz-lm-1.7B",
     });
-    const req = new Request(`http://localhost:3000/api/songs/${id}`);
+    const req = new Request(`http://localhost:5432/api/songs/${id}`);
     const res = await getSong(req, { params: { id } });
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -43,7 +43,7 @@ describe("GET /api/songs/[id]", () => {
   });
 
   it("returns 404 for missing song", async () => {
-    const req = new Request("http://localhost:3000/api/songs/nope");
+    const req = new Request("http://localhost:5432/api/songs/nope");
     const res = await getSong(req, { params: { id: "nope" } });
     expect(res.status).toBe(404);
   });
@@ -53,7 +53,7 @@ describe("DELETE /api/songs/[id]", () => {
   it("returns 204 and deletes the row", async () => {
     const db = getDb();
     const id = insertSong(db, { taskId: "t1", prompt: "p", lyrics: "", advanced: {} });
-    const req = new Request(`http://localhost:3000/api/songs/${id}`, { method: "DELETE" });
+    const req = new Request(`http://localhost:5432/api/songs/${id}`, { method: "DELETE" });
     const res = await deleteSong(req, { params: { id } });
     expect(res.status).toBe(204);
     const list = await listSongs();
@@ -61,7 +61,7 @@ describe("DELETE /api/songs/[id]", () => {
   });
 
   it("returns 404 for missing song", async () => {
-    const req = new Request("http://localhost:3000/api/songs/nope", { method: "DELETE" });
+    const req = new Request("http://localhost:5432/api/songs/nope", { method: "DELETE" });
     const res = await deleteSong(req, { params: { id: "nope" } });
     expect(res.status).toBe(404);
   });
