@@ -66,4 +66,4 @@ In a separate terminal:
 pnpm dev
 ```
 
-Open http://localhost:5432.
+Open http://localhost:5433.
