@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Launches ACE-Step 1.5 API server tuned for a 16GB NVIDIA GPU (Tier 6a).
-# Uses the XL (4B) DiT for higher audio quality with CPU offload.
+# Launches ACE-Step 1.5 API server tuned for a 12GB NVIDIA GPU (Tier 5).
+# Uses 2B sft DiT + 1.7B LM, vLLM backend, CPU offload.
 # Assumes ACE-Step-1.5 is cloned at $ACESTEP_DIR (or ../ACE-Step-1.5 by default)
 # and that `uv sync` has been run there.
 
@@ -17,10 +17,8 @@ fi
 
 cd "$ACESTEP_DIR"
 
-# 16GB VRAM tier (Tier 6a): XL (4B) sft DiT + 1.7B LM, vLLM backend, CPU offload.
-# XL models use ~9GB VRAM for weights (vs ~4.7GB for 2B) — higher audio quality.
-# CPU offload is required for XL below 20GB VRAM.
-export ACESTEP_CONFIG_PATH=acestep-v15-xl-sft
+# 12GB VRAM tier (Tier 5): 2B sft DiT + 1.7B LM, vLLM backend, CPU offload.
+export ACESTEP_CONFIG_PATH=acestep-v15-sft
 export ACESTEP_LM_MODEL_PATH=acestep-5Hz-lm-1.7B
 export ACESTEP_LM_BACKEND=vllm
 export ACESTEP_OFFLOAD_TO_CPU=true
@@ -30,6 +28,6 @@ export ACESTEP_API_PORT=8001
 export ACESTEP_API_WORKERS=1
 
 echo "Starting ACE-Step API from $ACESTEP_DIR on http://127.0.0.1:8001"
-echo "  DiT: acestep-v15-xl-sft (XL 4B, CPU offload)"
+echo "  DiT: acestep-v15-sft (2B, CPU offload)"
 echo "  LM:  acestep-5Hz-lm-1.7B (vLLM)"
 exec uv run acestep-api

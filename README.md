@@ -35,12 +35,17 @@ Edit `.env.local` if your ACE-Step server is on a different host/port.
 
 ### Terminal 1: ACE-Step API server
 
-**Desktop (16GB NVIDIA):**
+**12GB NVIDIA GPU:**
 ```
-./scripts/start-acestep.sh
+./scripts/start-acestep-12gb.sh
 ```
 
-**Mac (Apple Silicon):**
+**16GB NVIDIA GPU (XL quality):**
+```
+./scripts/start-acestep-16gb.sh
+```
+
+**Apple Silicon Mac (M1-M4, 16GB shared):**
 ```
 ./scripts/start-acestep-mac.sh
 ```
@@ -83,6 +88,6 @@ See `docs/superpowers/specs/2026-07-26-tuneamatic-design.md` for the full design
 
 ## Troubleshooting
 
-- **"ACE-Step server unreachable" on submit**: the API server isn't running. Start it with `./scripts/start-acestep.sh` (NVIDIA) or `./scripts/start-acestep-mac.sh` (Apple Silicon).
+- **"ACE-Step server unreachable" on submit**: the API server isn't running. Start it with one of the scripts in `scripts/` (12gb NVIDIA, 16gb NVIDIA, or Mac).
 - **Generation fails with OOM**: ensure `ACESTEP_OFFLOAD_TO_CPU=true` is set (it is by default in the launch script).
 - **Audio file missing**: if you deleted `storage/audio/` or moved the project, DB rows may reference missing files. Delete the song from the library and regenerate.
