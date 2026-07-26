@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.env.local
+data/tuneamatic.db
+data/tuneamatic.db-journal
+storage/audio/*
+!storage/audio/.gitkeep
+*.log
+tsconfig.tsbuildinfo
+.superpowers/sdd/task-*-report.md
+.superpowers/sdd/review-*.diff
