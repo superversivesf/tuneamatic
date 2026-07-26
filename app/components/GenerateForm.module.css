@@ -1,0 +1,91 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.input, .textarea {
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+  font-family: ui-monospace, monospace;
+}
+
+.submit {
+  background: #0070f3;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.submit:hover {
+  background: #0060d3;
+}
+
+.submit:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #c0392b;
+  font-size: 0.9rem;
+}
+
+.advancedToggle {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 0.9rem;
+  padding: 0.25rem 0;
+  text-align: left;
+}
+
+.advancedToggle:hover {
+  color: #333;
+}
+
+.advancedGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 0;
+}
+
+.advancedField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.advancedField label {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.advancedField input, .advancedField select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
