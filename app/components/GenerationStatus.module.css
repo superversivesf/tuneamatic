@@ -1,0 +1,35 @@
+.status {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.timer {
+  font-variant-numeric: tabular-nums;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.error {
+  border-color: #f5c6cb;
+  background: #f8d7da;
+  color: #721c24;
+}
