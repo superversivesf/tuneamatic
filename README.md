@@ -6,7 +6,9 @@ A local web frontend for the [ACE-Step 1.5](https://github.com/ace-step/ACE-Step
 
 - Node.js 18+ and pnpm
 - Python 3.11+ and [uv](https://docs.astral.sh/uv/)
-- A CUDA GPU with ~12GB VRAM (also works with more; see ACE-Step's GPU compatibility guide)
+- A GPU with at least 12GB VRAM:
+  - **NVIDIA** (16GB): uses XL (4B) DiT + 1.7B LM with CPU offload — best quality
+  - **Apple Silicon** (M1-M4, 16GB shared): uses 2B DiT + 0.6B LM with MLX backend
 
 ## Setup
 
@@ -33,8 +35,14 @@ Edit `.env.local` if your ACE-Step server is on a different host/port.
 
 ### Terminal 1: ACE-Step API server
 
+**Desktop (16GB NVIDIA):**
 ```
 ./scripts/start-acestep.sh
+```
+
+**Mac (Apple Silicon):**
+```
+./scripts/start-acestep-mac.sh
 ```
 
 First run downloads models from HuggingFace (~several GB). The server starts on http://127.0.0.1:8001 once ready.
@@ -75,6 +83,6 @@ See `docs/superpowers/specs/2026-07-26-tuneamatic-design.md` for the full design
 
 ## Troubleshooting
 
-- **"ACE-Step server unreachable" on submit**: the API server isn't running. Start it with `./scripts/start-acestep.sh`.
+- **"ACE-Step server unreachable" on submit**: the API server isn't running. Start it with `./scripts/start-acestep.sh` (NVIDIA) or `./scripts/start-acestep-mac.sh` (Apple Silicon).
 - **Generation fails with OOM**: ensure `ACESTEP_OFFLOAD_TO_CPU=true` is set (it is by default in the launch script).
 - **Audio file missing**: if you deleted `storage/audio/` or moved the project, DB rows may reference missing files. Delete the song from the library and regenerate.
