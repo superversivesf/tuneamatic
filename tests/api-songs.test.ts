@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GET as listSongs, toApiResponse } from "@/app/api/songs/route";
+import { GET as listSongs } from "@/app/api/songs/route";
 import { GET as getSong, DELETE as deleteSong } from "@/app/api/songs/[id]/route";
 import { insertSong, markReady } from "@/lib/db";
 import { getDb } from "@/lib/app-db";

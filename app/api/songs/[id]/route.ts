@@ -3,7 +3,7 @@ import { getDb } from "@/lib/app-db";
 import { getSong, deleteSong } from "@/lib/db";
 import { unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { toApiResponse } from "@/app/api/songs/route";
+import { toApiResponse } from "@/lib/api-response";
 
 export async function GET(
   req: Request,

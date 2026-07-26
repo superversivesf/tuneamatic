@@ -1,7 +1,7 @@
 import { SongList } from "@/app/components/SongList";
 import { getDb } from "@/lib/app-db";
 import { listSongs } from "@/lib/db";
-import { toApiResponse } from "@/app/api/songs/route";
+import { toApiResponse } from "@/lib/api-response";
 
 export const dynamic = "force-dynamic";
 
