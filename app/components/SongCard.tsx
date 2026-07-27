@@ -6,7 +6,7 @@ import type { SongApiResponse } from "@/lib/types";
 import styles from "./SongCard.module.css";
 
 function formatDate(ms: number): string {
-  return new Date(ms).toLocaleString();
+  return new Date(ms).toISOString().replace("T", " ").slice(0, 19);
 }
 
 export function SongCard({ song }: { song: SongApiResponse }) {

@@ -46,6 +46,7 @@ export async function pollOnce(
   for (const song of pending) {
     const r = byTaskId.get(song.taskId);
     if (!r) continue;
+    console.log(`[poller] song ${song.id} task ${song.taskId} status=${r.status}`);
     if (r.status === 1) {
       const audioDir = join(opts.storageDir, "audio");
       mkdirSync(audioDir, { recursive: true });
@@ -81,7 +82,7 @@ export function startPoller(): void {
   started = true;
   const baseUrl = process.env.ACESTEP_API_URL ?? "http://localhost:8001";
   const apiKey = process.env.ACESTEP_API_KEY || undefined;
-  const storageDir = process.cwd();
+  const storageDir = join(process.cwd(), "storage");
   const db = initDb(join(process.cwd(), "data", "tuneamatic.db"));
   const client = createAceStepClient({ baseUrl, apiKey });
   intervalHandle = setInterval(() => {
