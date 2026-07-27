@@ -74,6 +74,7 @@ export async function pollOnce(
         ditModel: r.dit_model ?? "",
         lmModel: r.lm_model ?? "",
       });
+      console.log(`[poller] marked ready: ${song.id}, audioPath=${relPath}`);
     } else if (r.status === 2) {
       markFailed(db, song.id, r.error ?? "ACE-Step task failed (no error message)");
     }
