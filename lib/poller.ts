@@ -1,6 +1,7 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { initDb, listPendingSongs, markReady, markFailed } from "@/lib/db";
+import { listPendingSongs, markReady, markFailed } from "@/lib/db";
+import { getDb } from "@/lib/app-db";
 import { createAceStepClient } from "@/lib/acestep-client";
 import type { Database } from "better-sqlite3";
 import type { AceStepClient } from "@/lib/acestep-client";
@@ -85,7 +86,7 @@ export function startPoller(): void {
   const baseUrl = process.env.ACESTEP_API_URL ?? "http://localhost:8001";
   const apiKey = process.env.ACESTEP_API_KEY || undefined;
   const storageDir = join(process.cwd(), "storage");
-  const db = initDb(join(process.cwd(), "data", "tuneamatic.db"));
+  const db = getDb();
   const client = createAceStepClient({ baseUrl, apiKey });
   intervalHandle = setInterval(() => {
     pollOnce(db, client, { storageDir }).catch((err) => {
