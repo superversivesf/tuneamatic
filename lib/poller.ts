@@ -55,7 +55,9 @@ export async function pollOnce(
       try {
         const buf = await client.downloadAudio(r.file!);
         writeFileSync(absPath, Buffer.from(buf));
+        console.log(`[poller] downloaded ${buf.byteLength} bytes to ${absPath}`);
       } catch (err) {
+        console.error(`[poller] audio download failed for ${song.id}:`, err);
         const count = (failureCounts.get(song.id) ?? 0) + 1;
         failureCounts.set(song.id, count);
         if (count >= MAX_FAILURES) {
