@@ -45,6 +45,7 @@ export function GenerateForm() {
     setPrompt("");
     setLyrics("");
     setAdvanced({});
+    setSongId(null);
   }
 
   return (
@@ -86,9 +87,9 @@ export function GenerateForm() {
         <button
           className={styles.submit}
           type="submit"
-          disabled={submitting || !prompt.trim()}
+          disabled={submitting || !prompt.trim() || !!songId}
         >
-          {submitting ? "Submitting…" : "Generate song"}
+          {submitting ? "Submitting…" : songId ? "Generating…" : "Generate song"}
         </button>
       </form>
       {songId && <GenerationStatus id={songId} onComplete={handleComplete} />}
