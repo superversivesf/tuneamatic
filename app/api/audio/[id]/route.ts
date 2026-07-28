@@ -11,18 +11,20 @@ export async function GET(
 ): Promise<Response> {
   const db = getDb();
   const song = getSong(db, params.id);
-  console.log(`[audio] id=${params.id} song=${song ? `found status=${song.status} audioPath=${song.audioPath}` : 'not found'}`);
   if (!song || song.status !== "ready" || !song.audioPath) {
     return NextResponse.json({ error: "audio not available" }, { status: 404 });
   }
   const absPath = join(process.cwd(), "storage", song.audioPath);
-  console.log(`[audio] looking for file at ${absPath}`);
   let size: number;
   try {
     size = statSync(absPath).size;
   } catch {
     return NextResponse.json({ error: "audio file missing" }, { status: 404 });
   }
+
+  const downloadName = (song.title || song.prompt || song.id)
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 60) + ".mp3";
 
   const range = req.headers.get("range");
   if (range) {
@@ -51,6 +53,7 @@ export async function GET(
       "Accept-Ranges": "bytes",
       "Content-Length": String(size),
       "Content-Type": "audio/mpeg",
+      "Content-Disposition": `attachment; filename="${downloadName}"`,
     },
   });
 }

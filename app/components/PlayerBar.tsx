@@ -29,7 +29,7 @@ export function PlayerBar() {
           <a
             className={styles.download}
             href={song.audioUrl}
-            download={downloadName}
+            download
           >
             Download
           </a>
