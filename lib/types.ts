@@ -8,6 +8,8 @@ export interface AdvancedParams {
   seed?: number;
   batchSize?: number;
   thinking?: boolean;
+  inferenceSteps?: number;
+  guidanceScale?: number;
 }
 
 export interface GenerateRequest {

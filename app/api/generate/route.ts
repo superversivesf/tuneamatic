@@ -31,6 +31,8 @@ export async function POST(req: Request): Promise<Response> {
   if (advanced.timeSignature) payload.time_signature = advanced.timeSignature;
   if (advanced.seed !== undefined) payload.seed = advanced.seed;
   if (advanced.batchSize !== undefined) payload.batch_size = advanced.batchSize;
+  if (advanced.inferenceSteps !== undefined) payload.inference_steps = advanced.inferenceSteps;
+  if (advanced.guidanceScale !== undefined) payload.guidance_scale = advanced.guidanceScale;
 
   try {
     const client = getClient();

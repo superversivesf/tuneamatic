@@ -17,8 +17,9 @@ fi
 
 cd "$ACESTEP_DIR"
 
-# 12GB VRAM tier (Tier 5): 2B sft DiT + 1.7B LM, vLLM backend, CPU offload.
-export ACESTEP_CONFIG_PATH=acestep-v15-sft
+# 12GB VRAM tier (Tier 5): turbo DiT + 1.7B LM, vLLM backend, CPU offload.
+# Turbo model is optimized for 8 inference steps — fast and good quality.
+export ACESTEP_CONFIG_PATH=acestep-v15-turbo
 export ACESTEP_LM_MODEL_PATH=acestep-5Hz-lm-1.7B
 export ACESTEP_LM_BACKEND=vllm
 export ACESTEP_OFFLOAD_TO_CPU=true
@@ -28,6 +29,6 @@ export ACESTEP_API_PORT=8001
 export ACESTEP_API_WORKERS=1
 
 echo "Starting ACE-Step API from $ACESTEP_DIR on http://127.0.0.1:8001"
-echo "  DiT: acestep-v15-sft (2B, CPU offload)"
+echo "  DiT: acestep-v15-turbo (turbo, CPU offload)"
 echo "  LM:  acestep-5Hz-lm-1.7B (vLLM)"
 exec uv run acestep-api

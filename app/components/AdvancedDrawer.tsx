@@ -10,6 +10,8 @@ export interface AdvancedValues {
   seed?: number;
   batchSize?: number;
   thinking?: boolean;
+  inferenceSteps?: number;
+  guidanceScale?: number;
 }
 
 export function AdvancedDrawer({
@@ -113,6 +115,31 @@ export function AdvancedDrawer({
               value={values.batchSize ?? 1}
               onChange={(e) =>
                 set("batchSize", e.target.value ? Number(e.target.value) : 1)
+              }
+            />
+          </div>
+          <div className={styles.advancedField}>
+            <label>Inference steps (turbo: 8, base: 32–64)</label>
+            <input
+              type="number"
+              min={1}
+              max={200}
+              value={values.inferenceSteps ?? ""}
+              onChange={(e) =>
+                set("inferenceSteps", e.target.value ? Number(e.target.value) : undefined)
+              }
+            />
+          </div>
+          <div className={styles.advancedField}>
+            <label>Guidance scale (base model only)</label>
+            <input
+              type="number"
+              step={0.5}
+              min={1}
+              max={20}
+              value={values.guidanceScale ?? ""}
+              onChange={(e) =>
+                set("guidanceScale", e.target.value ? Number(e.target.value) : undefined)
               }
             />
           </div>
