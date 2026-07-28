@@ -10,6 +10,7 @@ export interface AdvancedParams {
   thinking?: boolean;
   inferenceSteps?: number;
   guidanceScale?: number;
+  cotCaption?: boolean;
 }
 
 export interface GenerateRequest {

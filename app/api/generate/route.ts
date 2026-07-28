@@ -34,6 +34,7 @@ export async function POST(req: Request): Promise<Response> {
   if (advanced.batchSize !== undefined) payload.batch_size = advanced.batchSize;
   if (advanced.inferenceSteps !== undefined) payload.inference_steps = advanced.inferenceSteps;
   if (advanced.guidanceScale !== undefined) payload.guidance_scale = advanced.guidanceScale;
+  if (advanced.cotCaption !== undefined) payload.use_cot_caption = advanced.cotCaption;
 
   try {
     const client = getClient();
