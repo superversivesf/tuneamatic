@@ -79,6 +79,9 @@ export function AdvancedDrawer({
               Allow LM to rewrite description (CoT)
               <Tip text="When ON (default), the LM uses Chain-of-Thought to expand and rewrite your description. This is why your BPM/key/style may be overridden. Turn OFF to force ACE-Step to use your description literally. Only works when Thinking mode is ON." />
             </label>
+            <div style={{ marginLeft: "1.5rem", fontSize: "0.8rem", color: "#666", marginTop: "0.25rem" }}>
+              BPM, key, and time signature set in the fields below are always preserved — even when CoT is ON. The LM only rewrites the description text, not these parameters. Put your tempo/key here, not in the description.
+            </div>
           </div>
           <div className={styles.advancedField}>
             <label>
