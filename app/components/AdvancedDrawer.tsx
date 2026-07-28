@@ -9,6 +9,7 @@ export interface AdvancedValues {
   timeSignature?: string;
   seed?: number;
   batchSize?: number;
+  thinking?: boolean;
 }
 
 export function AdvancedDrawer({
@@ -36,6 +37,17 @@ export function AdvancedDrawer({
       </button>
       {open && (
         <div className={styles.advancedGrid}>
+          <div className={styles.advancedField} style={{ gridColumn: "1 / -1" }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={values.thinking ?? true}
+                onChange={(e) => set("thinking", e.target.checked)}
+                style={{ marginRight: "0.5rem" }}
+              />
+              Thinking mode (LM plans the song — higher quality, but may override your BPM/key)
+            </label>
+          </div>
           <div className={styles.advancedField}>
             <label>Duration (s, 10–600)</label>
             <input

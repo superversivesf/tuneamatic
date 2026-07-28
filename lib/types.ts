@@ -7,6 +7,7 @@ export interface AdvancedParams {
   timeSignature?: string;
   seed?: number;
   batchSize?: number;
+  thinking?: boolean;
 }
 
 export interface GenerateRequest {

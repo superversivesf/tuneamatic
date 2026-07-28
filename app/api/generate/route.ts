@@ -23,7 +23,7 @@ export async function POST(req: Request): Promise<Response> {
   const payload: any = {
     prompt,
     lyrics,
-    thinking: true,
+    thinking: advanced.thinking !== undefined ? advanced.thinking : true,
   };
   if (advanced.duration !== undefined) payload.audio_duration = advanced.duration;
   if (advanced.bpm !== undefined) payload.bpm = advanced.bpm;
