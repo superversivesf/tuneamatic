@@ -16,6 +16,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [song, setSong] = useState<SongApiResponse | null>(null);
 
   function load(s: SongApiResponse) {
+    if (song?.id === s.id && s.audioUrl) return;
     setSong(s);
     if (audioRef.current && s.audioUrl) {
       audioRef.current.src = s.audioUrl;

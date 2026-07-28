@@ -19,6 +19,7 @@ export function GenerationStatus({ id }: { id: string }) {
 
   useEffect(() => {
     let stop = false;
+    let loaded = false;
     async function tick() {
       const res = await fetch(`/api/songs/${id}`);
       if (!res.ok) return;
@@ -26,7 +27,10 @@ export function GenerationStatus({ id }: { id: string }) {
       if (stop) return;
       setSong(s);
       if (s.status === "ready") {
-        load(s);
+        if (!loaded) {
+          loaded = true;
+          load(s);
+        }
         return;
       }
       if (s.status === "failed") return;
