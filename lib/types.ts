@@ -26,6 +26,7 @@ export interface Song {
   id: string;
   taskId: string;
   status: SongStatus;
+  title: string;
   prompt: string;
   lyrics: string;
   advanced: AdvancedParams;
@@ -45,11 +46,14 @@ export interface SongMetas {
   genres?: string;
   keyscale?: string;
   timesignature?: string;
+  prompt?: string;
+  lyrics?: string;
 }
 
 export interface SongApiResponse {
   id: string;
   status: SongStatus;
+  title: string;
   prompt: string;
   lyrics: string;
   advanced: AdvancedParams;

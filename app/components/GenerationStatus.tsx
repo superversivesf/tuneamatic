@@ -11,10 +11,11 @@ function formatElapsed(ms: number): string {
   return `${m}:${r.toString().padStart(2, "0")}`;
 }
 
-export function GenerationStatus({ id }: { id: string }) {
+export function GenerationStatus({ id, onComplete }: { id: string; onComplete?: () => void }) {
   const { load } = usePlayer();
   const [song, setSong] = useState<SongApiResponse | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [done, setDone] = useState(false);
   const createdAtRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -31,14 +32,20 @@ export function GenerationStatus({ id }: { id: string }) {
           loaded = true;
           load(s);
         }
+        setDone(true);
+        onComplete?.();
         return;
       }
-      if (s.status === "failed") return;
+      if (s.status === "failed") {
+        setDone(true);
+        onComplete?.();
+        return;
+      }
       setTimeout(tick, 2000);
     }
     tick();
     return () => { stop = true; };
-  }, [id, load]);
+  }, [id, load, onComplete]);
 
   useEffect(() => {
     if (!song) return;
@@ -50,22 +57,41 @@ export function GenerationStatus({ id }: { id: string }) {
     return () => clearInterval(t);
   }, [song]);
 
-  if (!song || song.status !== "pending") {
-    if (song?.status === "failed") {
-      return (
+  if (!song) return null;
+
+  const expandedPrompt = song.metas?.prompt;
+  const metas = song.metas;
+
+  return (
+    <div>
+      {song.status === "pending" && (
+        <div className={styles.status}>
+          <span className={styles.spinner} aria-label="generating" />
+          <span>Generating…</span>
+          <span className={styles.timer}>{formatElapsed(elapsed)}</span>
+        </div>
+      )}
+      {song.status === "failed" && (
         <div className={`${styles.status} ${styles.error}`}>
           <span>Generation failed: {song.error ?? "unknown error"}</span>
         </div>
-      );
-    }
-    return null;
-  }
-
-  return (
-    <div className={styles.status}>
-      <span className={styles.spinner} aria-label="generating" />
-      <span>Generating…</span>
-      <span className={styles.timer}>{formatElapsed(elapsed)}</span>
+      )}
+      {song.status === "ready" && (
+        <div className={styles.status}>
+          <span>Done! Ready to play.</span>
+        </div>
+      )}
+      {expandedPrompt && (
+        <div style={{ marginTop: "0.75rem", padding: "0.75rem", background: "#f0f0f0", borderRadius: "6px", fontSize: "0.85rem" }}>
+          <strong>Expanded prompt (what ACE-Step actually used):</strong>
+          <pre style={{ whiteSpace: "pre-wrap", marginTop: "0.5rem", fontFamily: "inherit" }}>{expandedPrompt}</pre>
+        </div>
+      )}
+      {metas && song.status === "ready" && (
+        <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", color: "#666" }}>
+          BPM: {metas.bpm ?? "?"} | Key: {metas.keyscale ?? "?"} | Duration: {metas.duration ?? "?"}s | Time sig: {metas.timesignature ?? "?"}
+        </div>
+      )}
     </div>
   );
 }

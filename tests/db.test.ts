@@ -7,6 +7,7 @@ describe("db", () => {
     const db = makeTestDb();
     const id = insertSong(db, {
       taskId: "ace-task-123",
+      title: "",
       prompt: "upbeat pop song",
       lyrics: "hello world",
       advanced: { bpm: 120 },
@@ -30,6 +31,7 @@ describe("markReady", () => {
     const db = makeTestDb();
     const id = insertSong(db, {
       taskId: "t1",
+      title: "",
       prompt: "p",
       lyrics: "",
       advanced: {},
@@ -55,7 +57,7 @@ describe("markReady", () => {
 describe("markFailed", () => {
   it("sets status=failed and stores error", () => {
     const db = makeTestDb();
-    const id = insertSong(db, { taskId: "t1", prompt: "p", lyrics: "", advanced: {} });
+    const id = insertSong(db, { taskId: "t1", title: "", prompt: "p", lyrics: "", advanced: {} });
     markFailed(db, id, "GPU OOM");
     const song = getSong(db, id)!;
     expect(song.status).toBe("failed");
@@ -67,8 +69,8 @@ describe("markFailed", () => {
 describe("listSongs / listPendingSongs / deleteSong", () => {
   it("lists songs newest-first", () => {
     const db = makeTestDb();
-    const id1 = insertSong(db, { taskId: "t1", prompt: "p1", lyrics: "", advanced: {} });
-    const id2 = insertSong(db, { taskId: "t2", prompt: "p2", lyrics: "", advanced: {} });
+    const id1 = insertSong(db, { taskId: "t1", title: "", prompt: "p1", lyrics: "", advanced: {} });
+    const id2 = insertSong(db, { taskId: "t2", title: "", prompt: "p2", lyrics: "", advanced: {} });
     const songs = listSongs(db);
     expect(songs).toHaveLength(2);
     expect(songs[0].id).toBe(id2);
@@ -77,8 +79,8 @@ describe("listSongs / listPendingSongs / deleteSong", () => {
 
   it("lists only pending songs", () => {
     const db = makeTestDb();
-    const id1 = insertSong(db, { taskId: "t1", prompt: "p1", lyrics: "", advanced: {} });
-    const id2 = insertSong(db, { taskId: "t2", prompt: "p2", lyrics: "", advanced: {} });
+    const id1 = insertSong(db, { taskId: "t1", title: "", prompt: "p1", lyrics: "", advanced: {} });
+    const id2 = insertSong(db, { taskId: "t2", title: "", prompt: "p2", lyrics: "", advanced: {} });
     markFailed(db, id2, "err");
     const pending = listPendingSongs(db);
     expect(pending).toHaveLength(1);
@@ -87,7 +89,7 @@ describe("listSongs / listPendingSongs / deleteSong", () => {
 
   it("deletes a song and returns true; false for missing", () => {
     const db = makeTestDb();
-    const id = insertSong(db, { taskId: "t1", prompt: "p1", lyrics: "", advanced: {} });
+    const id = insertSong(db, { taskId: "t1", title: "", prompt: "p1", lyrics: "", advanced: {} });
     expect(deleteSong(db, id)).toBe(true);
     expect(getSong(db, id)).toBeNull();
     expect(deleteSong(db, "nonexistent")).toBe(false);

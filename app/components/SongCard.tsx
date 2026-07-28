@@ -22,7 +22,7 @@ export function SongCard({ song }: { song: SongApiResponse }) {
 
   return (
     <div className={styles.card}>
-      <div className={styles.prompt} title={song.prompt}>{song.prompt}</div>
+      <div className={styles.prompt} title={song.prompt}>{song.title || song.prompt}</div>
       {song.lyrics && (
         <div className={styles.lyrics}>{song.lyrics}</div>
       )}

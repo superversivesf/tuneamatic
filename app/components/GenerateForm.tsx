@@ -5,6 +5,7 @@ import { GenerationStatus } from "@/app/components/GenerationStatus";
 import styles from "./GenerateForm.module.css";
 
 export function GenerateForm() {
+  const [title, setTitle] = useState("");
   const [prompt, setPrompt] = useState("");
   const [lyrics, setLyrics] = useState("");
   const [advanced, setAdvanced] = useState<AdvancedValues>({});
@@ -24,7 +25,7 @@ export function GenerateForm() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, lyrics, advanced }),
+        body: JSON.stringify({ title, prompt, lyrics, advanced }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -32,9 +33,6 @@ export function GenerateForm() {
       }
       const data = await res.json();
       setSongId(data.id);
-      setPrompt("");
-      setLyrics("");
-      setAdvanced({});
     } catch (err: any) {
       setError(err.message ?? "Something went wrong");
     } finally {
@@ -42,9 +40,27 @@ export function GenerateForm() {
     }
   }
 
+  function handleComplete() {
+    setTitle("");
+    setPrompt("");
+    setLyrics("");
+    setAdvanced({});
+  }
+
   return (
     <div>
       <form className={styles.form} onSubmit={onSubmit}>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="title">Song title (optional)</label>
+          <input
+            id="title"
+            className={styles.input}
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Alien Abduction Love Song"
+          />
+        </div>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="prompt">Description</label>
           <textarea
@@ -75,7 +91,7 @@ export function GenerateForm() {
           {submitting ? "Submitting…" : "Generate song"}
         </button>
       </form>
-      {songId && <GenerationStatus id={songId} />}
+      {songId && <GenerationStatus id={songId} onComplete={handleComplete} />}
     </div>
   );
 }

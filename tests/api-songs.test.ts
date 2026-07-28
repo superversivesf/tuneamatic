@@ -11,8 +11,8 @@ beforeEach(() => {
 describe("GET /api/songs", () => {
   it("returns songs newest-first as SongApiResponse", async () => {
     const db = getDb();
-    const id1 = insertSong(db, { taskId: "t1", prompt: "first", lyrics: "a", advanced: {} });
-    const id2 = insertSong(db, { taskId: "t2", prompt: "second", lyrics: "b", advanced: {} });
+    const id1 = insertSong(db, { taskId: "t1", title: "", prompt: "first", lyrics: "a", advanced: {} });
+    const id2 = insertSong(db, { taskId: "t2", title: "", prompt: "second", lyrics: "b", advanced: {} });
     const res = await listSongs();
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -26,7 +26,7 @@ describe("GET /api/songs", () => {
 describe("GET /api/songs/[id]", () => {
   it("returns the song with audioUrl when ready", async () => {
     const db = getDb();
-    const id = insertSong(db, { taskId: "t1", prompt: "p", lyrics: "", advanced: {} });
+    const id = insertSong(db, { taskId: "t1", title: "", prompt: "p", lyrics: "", advanced: {} });
     markReady(db, id, {
       audioPath: `audio/${id}.mp3`,
       metas: { bpm: 120 },
@@ -52,7 +52,7 @@ describe("GET /api/songs/[id]", () => {
 describe("DELETE /api/songs/[id]", () => {
   it("returns 204 and deletes the row", async () => {
     const db = getDb();
-    const id = insertSong(db, { taskId: "t1", prompt: "p", lyrics: "", advanced: {} });
+    const id = insertSong(db, { taskId: "t1", title: "", prompt: "p", lyrics: "", advanced: {} });
     const req = new Request(`http://localhost:5433/api/songs/${id}`, { method: "DELETE" });
     const res = await deleteSong(req, { params: { id } });
     expect(res.status).toBe(204);

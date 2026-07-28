@@ -34,7 +34,7 @@ describe("pollOnce", () => {
 
   it("downloads audio and marks ready when status=1", async () => {
     const db = makeTestDb();
-    const id = insertSong(db, { taskId: "t1", prompt: "p", lyrics: "", advanced: {} });
+    const id = insertSong(db, { taskId: "t1", title: "", prompt: "p", lyrics: "", advanced: {} });
 
     const audioBuf = new ArrayBuffer(16);
     const client = mockClient({
@@ -69,7 +69,7 @@ describe("pollOnce", () => {
 
   it("marks failed when status=2", async () => {
     const db = makeTestDb();
-    const id = insertSong(db, { taskId: "t1", prompt: "p", lyrics: "", advanced: {} });
+    const id = insertSong(db, { taskId: "t1", title: "", prompt: "p", lyrics: "", advanced: {} });
     const client = mockClient({
       queryResults: vi.fn().mockResolvedValue([
         { taskId: "t1", status: 2 as const, error: "OOM" },
@@ -92,7 +92,7 @@ describe("pollOnce", () => {
 
   it("skips status=0 (still running)", async () => {
     const db = makeTestDb();
-    const id = insertSong(db, { taskId: "t1", prompt: "p", lyrics: "", advanced: {} });
+    const id = insertSong(db, { taskId: "t1", title: "", prompt: "p", lyrics: "", advanced: {} });
     const client = mockClient({
       queryResults: vi.fn().mockResolvedValue([{ taskId: "t1", status: 0 as const }]),
     });

@@ -4,11 +4,15 @@ import styles from "./PlayerBar.module.css";
 
 export function PlayerBar() {
   const { song, audioRef } = usePlayer();
+  const displayName = song?.title || song?.prompt || "Unknown";
+  const downloadName = song?.title
+    ? `${song.title.replace(/[^a-zA-Z0-9_-]/g, "_")}.mp3`
+    : `${song?.id ?? "song"}.mp3`;
   return (
     <div className={styles.bar}>
       <div className={styles.title}>
         {song ? (
-          <span title={song.prompt}>{song.prompt}</span>
+          <span title={song.prompt}>{displayName}</span>
         ) : (
           <span className={styles.empty}>No song loaded</span>
         )}
@@ -17,6 +21,7 @@ export function PlayerBar() {
         <>
           <audio
             ref={audioRef}
+            src={song.audioUrl}
             controls
             className={styles.audio}
             data-testid="player-audio"
@@ -24,7 +29,7 @@ export function PlayerBar() {
           <a
             className={styles.download}
             href={song.audioUrl}
-            download={`${song.id}.mp3`}
+            download={downloadName}
           >
             Download
           </a>

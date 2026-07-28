@@ -17,6 +17,7 @@ export async function POST(req: Request): Promise<Response> {
     return NextResponse.json({ error: "prompt is required" }, { status: 400 });
   }
 
+  const title: string = (body?.title ?? "").toString().trim();
   const lyrics: string = (body?.lyrics ?? "").toString();
   const advanced: AdvancedParams = body?.advanced ?? {};
 
@@ -38,7 +39,7 @@ export async function POST(req: Request): Promise<Response> {
     const client = getClient();
     const { taskId } = await client.releaseTask(payload);
     const db = getDb();
-    const id = insertSong(db, { taskId, prompt, lyrics, advanced });
+    const id = insertSong(db, { taskId, title, prompt, lyrics, advanced });
     return NextResponse.json({ id }, { status: 200 });
   } catch (err: any) {
     const msg = err?.message ?? String(err);

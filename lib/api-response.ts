@@ -4,6 +4,7 @@ export function toApiResponse(s: Song): SongApiResponse {
   return {
     id: s.id,
     status: s.status,
+    title: s.title,
     prompt: s.prompt,
     lyrics: s.lyrics,
     advanced: s.advanced,

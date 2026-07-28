@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS songs (
   id          TEXT PRIMARY KEY,
   task_id     TEXT NOT NULL,
   status      TEXT NOT NULL,
+  title       TEXT NOT NULL DEFAULT '',
   prompt      TEXT NOT NULL,
   lyrics      TEXT NOT NULL DEFAULT '',
   advanced    TEXT NOT NULL DEFAULT '{}',
@@ -29,19 +30,24 @@ export function initDb(dbPath: string): DB {
   const db = new Database(dbPath);
   db.pragma("journal_mode = WAL");
   db.exec(SCHEMA);
+  try {
+    db.exec("ALTER TABLE songs ADD COLUMN title TEXT NOT NULL DEFAULT ''");
+  } catch {
+    /* column already exists */
+  }
   return db;
 }
 
 export function insertSong(
   db: DB,
-  input: { taskId: string; prompt: string; lyrics: string; advanced: AdvancedParams }
+  input: { taskId: string; title: string; prompt: string; lyrics: string; advanced: AdvancedParams }
 ): string {
   const id = nanoid();
   const now = Date.now();
   db.prepare(
-    `INSERT INTO songs (id, task_id, status, prompt, lyrics, advanced, created_at)
-     VALUES (?, ?, 'pending', ?, ?, ?, ?)`
-  ).run(id, input.taskId, input.prompt, input.lyrics, JSON.stringify(input.advanced), now);
+    `INSERT INTO songs (id, task_id, status, title, prompt, lyrics, advanced, created_at)
+     VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)`
+  ).run(id, input.taskId, input.title, input.prompt, input.lyrics, JSON.stringify(input.advanced), now);
   return id;
 }
 
@@ -50,6 +56,7 @@ function rowToSong(row: any): Song {
     id: row.id,
     taskId: row.task_id,
     status: row.status as SongStatus,
+    title: row.title ?? "",
     prompt: row.prompt,
     lyrics: row.lyrics,
     advanced: JSON.parse(row.advanced),
