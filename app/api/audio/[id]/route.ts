@@ -4,6 +4,7 @@ import { getSong } from "@/lib/db";
 import { createReadStream, statSync } from "node:fs";
 import { join } from "node:path";
 import { Readable } from "node:stream";
+import { getStorageDir } from "@/lib/storage";
 
 export async function GET(
   req: Request,
@@ -14,7 +15,7 @@ export async function GET(
   if (!song || song.status !== "ready" || !song.audioPath) {
     return NextResponse.json({ error: "audio not available" }, { status: 404 });
   }
-  const absPath = join(process.cwd(), "storage", song.audioPath);
+  const absPath = join(getStorageDir(), song.audioPath);
   let size: number;
   try {
     size = statSync(absPath).size;
@@ -28,10 +29,31 @@ export async function GET(
 
   const range = req.headers.get("range");
   if (range) {
-    const m = /bytes=(\d*)-(\d*)/.exec(range);
-    if (m) {
-      const start = m[1] ? parseInt(m[1], 10) : 0;
-      const end = m[2] ? parseInt(m[2], 10) : size - 1;
+    const m = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
+    let start = 0, end = 0;
+    let satisfiable = true;
+    if (!m) {
+      satisfiable = false; // malformed → fall through to full 200
+    } else {
+      const [, s, e] = m;
+      if (s === "" && e === "") {
+        satisfiable = false;
+      } else if (s === "") {
+        // suffix range: last N bytes
+        const n = parseInt(e, 10);
+        if (n === 0) return new NextResponse(null, { status: 416, headers: { "Content-Range": `bytes */${size}` } });
+        start = Math.max(0, size - n);
+        end = size - 1;
+      } else {
+        start = parseInt(s, 10);
+        if (start >= size) {
+          return new NextResponse(null, { status: 416, headers: { "Content-Range": `bytes */${size}` } });
+        }
+        end = e === "" ? size - 1 : Math.min(parseInt(e, 10), size - 1);
+      }
+      if (satisfiable && end < start) end = size - 1;
+    }
+    if (m && satisfiable) {
       const chunkSize = end - start + 1;
       const stream = createReadStream(absPath, { start, end });
       return new NextResponse(Readable.toWeb(stream) as ReadableStream, {
