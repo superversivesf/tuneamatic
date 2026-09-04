@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { usePlayer } from "@/app/components/PlayerProvider";
-import type { SongApiResponse } from "@/lib/types";
+import type { SongApiResponse, SongStatus } from "@/lib/types";
 import styles from "./GenerationStatus.module.css";
 
 function formatElapsed(ms: number): string {
@@ -11,41 +11,55 @@ function formatElapsed(ms: number): string {
   return `${m}:${r.toString().padStart(2, "0")}`;
 }
 
-export function GenerationStatus({ id, onComplete }: { id: string; onComplete?: () => void }) {
+export function GenerationStatus({
+  id,
+  onComplete,
+}: {
+  id: string;
+  onComplete?: (status: SongStatus, error?: string | null) => void;
+}) {
   const { load } = usePlayer();
   const [song, setSong] = useState<SongApiResponse | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [done, setDone] = useState(false);
   const createdAtRef = useRef<number | null>(null);
+  const loadRef = useRef(load);
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => { loadRef.current = load; }, [load]);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
 
   useEffect(() => {
     let stop = false;
     let loaded = false;
     async function tick() {
-      const res = await fetch(`/api/songs/${id}`);
-      if (!res.ok) return;
-      const s: SongApiResponse = await res.json();
-      if (stop) return;
-      setSong(s);
-      if (s.status === "ready") {
-        if (!loaded) {
-          loaded = true;
-          load(s);
+      try {
+        const res = await fetch(`/api/songs/${id}`);
+        if (!res.ok) return;
+        const s: SongApiResponse = await res.json();
+        if (stop) return;
+        setSong(s);
+        if (s.status === "ready") {
+          if (!loaded) {
+            loaded = true;
+            loadRef.current(s);
+          }
+          setDone(true);
+          onCompleteRef.current?.(s.status);
+          return;
         }
-        setDone(true);
-        onComplete?.();
-        return;
+        if (s.status === "failed") {
+          setDone(true);
+          onCompleteRef.current?.(s.status, s.error);
+          return;
+        }
+        setTimeout(tick, 2000);
+      } catch {
+        if (!stop) setTimeout(tick, 2000); // transient network error — keep polling
       }
-      if (s.status === "failed") {
-        setDone(true);
-        onComplete?.();
-        return;
-      }
-      setTimeout(tick, 2000);
     }
     tick();
     return () => { stop = true; };
-  }, [id, load, onComplete]);
+  }, [id]);
 
   useEffect(() => {
     if (!song) return;

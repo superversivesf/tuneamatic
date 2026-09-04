@@ -2,6 +2,7 @@
 import { useState, FormEvent } from "react";
 import { AdvancedDrawer, AdvancedValues } from "@/app/components/AdvancedDrawer";
 import { GenerationStatus } from "@/app/components/GenerationStatus";
+import type { SongStatus } from "@/lib/types";
 import styles from "./GenerateForm.module.css";
 
 export function GenerateForm() {
@@ -40,12 +41,18 @@ export function GenerateForm() {
     }
   }
 
-  function handleComplete() {
-    setTitle("");
-    setPrompt("");
-    setLyrics("");
-    setAdvanced({});
+  function handleComplete(status: SongStatus, error?: string | null) {
     setSongId(null);
+    if (status === "ready") {
+      setTitle("");
+      setPrompt("");
+      setLyrics("");
+      setAdvanced({});
+      return;
+    }
+    if (status === "failed") {
+      setError(error ? `Generation failed: ${error}` : "Generation failed. Your inputs are preserved — try again.");
+    }
   }
 
   return (
