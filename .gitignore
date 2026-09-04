@@ -11,3 +11,4 @@ storage/audio/*
 tsconfig.tsbuildinfo
 .superpowers/sdd/task-*-report.md
 .superpowers/sdd/review-*.diff
+.worktrees/
