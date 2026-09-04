@@ -22,6 +22,69 @@
 
 ---
 
+### Task 0: Fix test isolation — per-worker test database
+
+**Why this comes first:** `tests/api-songs.test.ts` and `tests/api-generate.test.ts` both use the process-global `getDb()` (on-disk `data/tuneamatic.db`). Vitest runs test files in parallel worker processes against the same SQLite file, so row-count assertions race and the suite is flaky (reproduced on clean master). Every later task's gate (`pnpm test:run`) is untrustworthy until this is fixed.
+
+**Files:**
+- Modify: `lib/app-db.ts`
+- Test: `tests/api-songs.test.ts`, `tests/api-generate.test.ts` (verify no behavioral change needed — isolation is the fix)
+
+**Interfaces:**
+- Produces: `getDb(): Database` — resolves the DB path to `process.env.TUNEAMATIC_DB` when set, else `join(process.cwd(), "data", "tuneamatic.db")` (unchanged default). Test files set a unique per-file temp path BEFORE importing anything that calls `getDb()`.
+- Consumes: existing `initDb`
+
+- [ ] **Step 1: Make each API test file use its own DB**
+
+At the very top of `tests/api-songs.test.ts` and `tests/api-generate.test.ts` (before all imports), add:
+
+```typescript
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+process.env.TUNEAMATIC_DB = join(mkdtempSync(join(tmpdir(), "tuneamatic-test-")), "test.db");
+```
+
+(Established ESM imports hoist above this code — but `getDb()` is only invoked inside `beforeEach`/test bodies at runtime, long after this assignment runs, so module-load order does not matter here. Do NOT use `vi.stubEnv` — it applies per-test and races with lazy `getDb()` initialization.)
+
+- [ ] **Step 2: Add the env override to `lib/app-db.ts`**
+
+```typescript
+import { initDb } from "@/lib/db";
+import { join } from "node:path";
+import type { Database } from "better-sqlite3";
+
+let dbInstance: Database | null = null;
+
+export function getDb(): Database {
+  if (!dbInstance) {
+    dbInstance = initDb(process.env.TUNEAMATIC_DB ?? join(process.cwd(), "data", "tuneamatic.db"));
+  }
+  return dbInstance;
+}
+```
+
+- [ ] **Step 3: Verify the suite is deterministic**
+
+Run the full suite 3 times:
+
+```bash
+for i in 1 2 3; do pnpm test:run; done
+```
+
+Expected: 30/30 PASS, three consecutive times (previously ~1-in-3 failure rate).
+
+- [ ] **Step 4: Full gates + commit**
+
+```bash
+pnpm test:run && pnpm typecheck && pnpm lint
+git add lib/app-db.ts tests/api-songs.test.ts tests/api-generate.test.ts
+git commit -m "fix: per-worker test database isolation via TUNEAMATIC_DB env override"
+```
+
+---
+
 ### Task 1: DB — status guards, `reserved` lifecycle, WAL, listSongs limit
 
 **Files:**
@@ -1425,4 +1488,4 @@ git commit -m "feat: startup janitor for orphaned audio, reserved-row cleanup, m
 
 ## Final verification
 
-After all tasks: run the full suite one last time (`pnpm test:run && pnpm typecheck && pnpm lint`), then `git log --oneline` to confirm the 7-commit sequence, and spot-check `pnpm dev` boots with `[instrumentation] poller started, janitor removed N orphaned files` in the log.
+After all tasks: run the full suite twice (`pnpm test:run && pnpm test:run && pnpm typecheck && pnpm lint`), then `git log --oneline` to confirm the 8-commit sequence (Task 0 isolation + Tasks 1–7), and spot-check `pnpm dev` boots with `[instrumentation] poller started, janitor removed N orphaned files` in the log.
