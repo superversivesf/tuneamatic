@@ -7,6 +7,10 @@
 
 ---
 
+**Status 2026-09-04:** All confirmed issues (#1–#13) fixed. See `docs/superpowers/plans/2026-09-04-audit-fixes.md` for the implementation. #14 (test-gap) is addressed by the per-fix tests added during implementation.
+
+---
+
 ## Confirmed issues (fix these)
 
 ### 1. CRITICAL — Poller race can clobber successful songs (`ready` → `failed`)
