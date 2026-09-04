@@ -1,3 +1,9 @@
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+process.env.TUNEAMATIC_DB = join(mkdtempSync(join(tmpdir(), "tuneamatic-test-")), "test.db");
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GET as listSongs } from "@/app/api/songs/route";
 import { GET as getSong, DELETE as deleteSong } from "@/app/api/songs/[id]/route";

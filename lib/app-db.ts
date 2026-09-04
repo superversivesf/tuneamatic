@@ -6,7 +6,7 @@ let dbInstance: Database | null = null;
 
 export function getDb(): Database {
   if (!dbInstance) {
-    dbInstance = initDb(join(process.cwd(), "data", "tuneamatic.db"));
+    dbInstance = initDb(process.env.TUNEAMATIC_DB ?? join(process.cwd(), "data", "tuneamatic.db"));
   }
   return dbInstance;
 }

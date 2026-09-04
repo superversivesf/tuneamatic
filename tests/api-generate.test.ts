@@ -1,3 +1,9 @@
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+process.env.TUNEAMATIC_DB = join(mkdtempSync(join(tmpdir(), "tuneamatic-test-")), "test.db");
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { POST } from "@/app/api/generate/route";
 import { getDb } from "@/lib/app-db";
