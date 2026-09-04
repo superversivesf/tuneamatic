@@ -50,6 +50,7 @@ export function createAceStepClient(opts: {
       method: "POST",
       headers,
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) {
       const body = await res.text().catch(() => "");
@@ -67,6 +68,7 @@ export function createAceStepClient(opts: {
       method: "POST",
       headers,
       body: JSON.stringify({ task_id_list: taskIds }),
+      signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) {
       const body = await res.text().catch(() => "");
@@ -80,9 +82,13 @@ export function createAceStepClient(opts: {
         try { resultObj = JSON.parse(r.result); } catch { /* leave empty */ }
         if (Array.isArray(resultObj) && resultObj.length > 0) resultObj = resultObj[0];
       }
+      const status = r.status === 0 || r.status === 1 || r.status === 2 ? r.status : 0;
+      if (status !== r.status) {
+        console.warn(`[acestep] unknown task status ${r.status} for ${r.task_id}, treating as running`);
+      }
       return {
         taskId: r.task_id as string,
-        status: r.status as 0 | 1 | 2,
+        status,
         file: resultObj.file,
         prompt: resultObj.prompt,
         lyrics: resultObj.lyrics,
@@ -90,13 +96,14 @@ export function createAceStepClient(opts: {
         seed_value: resultObj.seed_value,
         lm_model: resultObj.lm_model,
         dit_model: resultObj.dit_model,
+        error: r.error ?? resultObj.error,
       };
     });
   }
 
   async function downloadAudio(path: string): Promise<ArrayBuffer> {
     const url = `${baseUrl}${path}`;
-    const res = await fetch(url);
+    const res = await fetch(url, { headers, signal: AbortSignal.timeout(300_000) });
     if (!res.ok) {
       throw new AceStepError(res.status, `ACE-Step audio download failed: ${res.status}`);
     }
@@ -105,7 +112,7 @@ export function createAceStepClient(opts: {
 
   async function ping(): Promise<boolean> {
     try {
-      const res = await fetch(`${baseUrl}/health`);
+      const res = await fetch(`${baseUrl}/health`, { signal: AbortSignal.timeout(30_000) });
       return res.ok;
     } catch {
       return false;

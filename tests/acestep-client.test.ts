@@ -129,3 +129,53 @@ describe("ping", () => {
     expect(await client.ping()).toBe(false);
   });
 });
+
+describe("downloadAudio auth + timeouts", () => {
+  it("sends the Authorization header when apiKey is set", async () => {
+    const client = createAceStepClient({ baseUrl: "http://ace:1", apiKey: "sekret" });
+    mockFetch.mockResolvedValueOnce({ ok: true, arrayBuffer: async () => new ArrayBuffer(4) });
+    await client.downloadAudio("/v1/audio?path=x");
+    const [, init] = mockFetch.mock.calls[0];
+    expect((init as any).headers.Authorization).toBe("Bearer sekret");
+  });
+
+  it("passes a fetch timeout signal on every call", async () => {
+    const client = createAceStepClient({ baseUrl: "http://ace:2" });
+    mockFetch.mockResolvedValueOnce({ ok: true, arrayBuffer: async () => new ArrayBuffer(4) });
+    await client.downloadAudio("/v1/audio?path=x");
+    const [, init] = mockFetch.mock.calls[0];
+    expect((init as any).signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("maps upstream error into QueryResult", async () => {
+    const client = createAceStepClient({ baseUrl: "http://ace:3" });
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: [{ task_id: "t1", status: 2, error: "GPU OOM" }] }),
+    });
+    const results = await client.queryResults(["t1"]);
+    expect(results[0].error).toBe("GPU OOM");
+  });
+
+  it("coerces unknown status to 0 (still running)", async () => {
+    const client = createAceStepClient({ baseUrl: "http://ace:4" });
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: [{ task_id: "t1", status: 3 }] }),
+    });
+    const results = await client.queryResults(["t1"]);
+    expect(results[0].status).toBe(0);
+  });
+
+  it("releaseTask and queryResults use AbortSignal timeouts", async () => {
+    const client = createAceStepClient({ baseUrl: "http://ace:5" });
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ data: { task_id: "t1" } }) });
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ data: [] }) });
+    await client.releaseTask({ prompt: "p", lyrics: "", thinking: true });
+    await client.queryResults(["t1"]);
+    const [, init1] = mockFetch.mock.calls[0];
+    const [, init2] = mockFetch.mock.calls[1];
+    expect((init1 as any).signal).toBeInstanceOf(AbortSignal);
+    expect((init2 as any).signal).toBeInstanceOf(AbortSignal);
+  });
+});
