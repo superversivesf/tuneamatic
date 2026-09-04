@@ -35,6 +35,8 @@ export function initDb(dbPath: string): DB {
   } catch {
     /* column already exists */
   }
+  db.pragma("busy_timeout = 5000");
+  db.pragma("wal_checkpoint(TRUNCATE)");
   return db;
 }
 
@@ -49,6 +51,30 @@ export function insertSong(
      VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)`
   ).run(id, input.taskId, input.title, input.prompt, input.lyrics, JSON.stringify(input.advanced), now);
   return id;
+}
+
+export function insertReservedSong(
+  db: DB,
+  input: { title: string; prompt: string; lyrics: string; advanced: AdvancedParams }
+): string {
+  const id = nanoid();
+  const now = Date.now();
+  db.prepare(
+    `INSERT INTO songs (id, task_id, status, title, prompt, lyrics, advanced, created_at)
+     VALUES (?, 'reserved', 'reserved', ?, ?, ?, ?, ?)`
+  ).run(id, input.title, input.prompt, input.lyrics, JSON.stringify(input.advanced), now);
+  return id;
+}
+
+export function activateSong(db: DB, id: string, taskId: string): boolean {
+  const result = db.prepare(
+    `UPDATE songs SET status = 'pending', task_id = ? WHERE id = ? AND status = 'reserved'`
+  ).run(taskId, id);
+  return result.changes > 0;
+}
+
+export function deleteExpiredReserved(db: DB, olderThanMs: number): void {
+  db.prepare(`DELETE FROM songs WHERE status = 'reserved' AND created_at < ?`).run(Date.now() - olderThanMs);
 }
 
 function rowToSong(row: any): Song {
@@ -86,8 +112,8 @@ export function markReady(
     ditModel: string;
     lmModel: string;
   }
-): void {
-  db.prepare(
+): boolean {
+  const result = db.prepare(
     `UPDATE songs SET
        status = 'ready',
        audio_path = ?,
@@ -95,8 +121,9 @@ export function markReady(
        metas = ?,
        seed_value = ?,
        dit_model = ?,
-       lm_model = ?
-     WHERE id = ?`
+       lm_model = ?,
+       error = NULL
+     WHERE id = ? AND status = 'pending'`
   ).run(
     fields.audioPath,
     Date.now(),
@@ -106,16 +133,18 @@ export function markReady(
     fields.lmModel,
     id
   );
+  return result.changes > 0;
 }
 
-export function markFailed(db: DB, id: string, error: string): void {
-  db.prepare(
-    `UPDATE songs SET status = 'failed', error = ? WHERE id = ?`
+export function markFailed(db: DB, id: string, error: string): boolean {
+  const result = db.prepare(
+    `UPDATE songs SET status = 'failed', error = ? WHERE id = ? AND status = 'pending'`
   ).run(error, id);
+  return result.changes > 0;
 }
 
-export function listSongs(db: DB): Song[] {
-  const rows = db.prepare("SELECT * FROM songs ORDER BY rowid DESC").all();
+export function listSongs(db: DB, limit = 500): Song[] {
+  const rows = db.prepare("SELECT * FROM songs ORDER BY rowid DESC LIMIT ?").all(limit);
   return rows.map(rowToSong);
 }
 

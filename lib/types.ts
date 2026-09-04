@@ -1,4 +1,4 @@
-export type SongStatus = "pending" | "ready" | "failed";
+export type SongStatus = "pending" | "ready" | "failed" | "reserved";
 
 export interface AdvancedParams {
   duration?: number;
