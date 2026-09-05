@@ -22,6 +22,9 @@ export async function GET(
   } catch {
     return NextResponse.json({ error: "audio file missing" }, { status: 404 });
   }
+  if (size === 0) {
+    return NextResponse.json({ error: "audio file missing" }, { status: 404 });
+  }
 
   const downloadName = (song.title || song.prompt || song.id)
     .replace(/[^a-zA-Z0-9_-]/g, "_")

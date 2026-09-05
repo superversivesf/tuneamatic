@@ -183,7 +183,10 @@ describe("pollOnce", () => {
 });
 
 describe("startPoller / stopPoller", () => {
-  afterEach(() => stopPoller());
+  afterEach(() => {
+    stopPoller();
+    vi.useRealTimers();
+  });
 
   it("is idempotent — startPoller twice only starts one loop", () => {
     startPoller();
@@ -219,6 +222,5 @@ describe("startPoller / stopPoller", () => {
     await vi.advanceTimersByTimeAsync(2100);
     expect(client.queryResults).toHaveBeenCalledTimes(2);
     stopPoller();
-    vi.useRealTimers();
   });
 });
