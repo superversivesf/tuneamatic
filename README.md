@@ -4,7 +4,7 @@ A local web frontend for the [ACE-Step 1.5](https://github.com/ace-step/ACE-Step
 
 ## Prerequisites
 
-- Node.js 18+ and pnpm
+- Node.js 20.9+ and pnpm
 - Python 3.11+ and [uv](https://docs.astral.sh/uv/)
 - A GPU with at least 12GB VRAM:
   - **NVIDIA** (16GB): uses XL (4B) DiT + 1.7B LM with CPU offload — best quality
@@ -28,6 +28,8 @@ cd tuneamatic
 pnpm install
 cp .env.local.example .env.local
 ```
+
+> If you switch Node.js major versions, run `pnpm rebuild better-sqlite3`.
 
 Edit `.env.local` if your ACE-Step server is on a different host/port.
 

@@ -9,6 +9,8 @@
 
 **Status 2026-09-04:** All confirmed issues (#1–#13) fixed. See `docs/superpowers/plans/2026-09-04-audit-fixes.md` for the implementation. #14 (test-gap) is addressed by the per-fix tests added during implementation.
 
+**Status 2026-09-05:** Dependency-tier findings reported by Dependabot post-merge (38 npm audit vulnerabilities, 26 production incl. 21 unpatchable-in-14 Next.js advisories) cleared via the Next 15.5.21 / React 19 / eslint 10 / vitest 5 upgrade — see `docs/superpowers/specs/2026-09-05-deps-upgrade-design.md`.
+
 ---
 
 ## Confirmed issues (fix these)
