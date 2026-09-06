@@ -4,7 +4,7 @@ A local web frontend for the [ACE-Step 1.5](https://github.com/ace-step/ACE-Step
 
 ## Prerequisites
 
-- Node.js 20.9+ and pnpm
+- Node.js 22.13+ and pnpm
 - Python 3.11+ and [uv](https://docs.astral.sh/uv/)
 - A GPU with at least 12GB VRAM:
   - **NVIDIA** (16GB): uses XL (4B) DiT + 1.7B LM with CPU offload — best quality
