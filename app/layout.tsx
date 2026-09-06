@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 import { PlayerProvider } from "@/app/components/PlayerProvider";
 import { PlayerBar } from "@/app/components/PlayerBar";
@@ -29,8 +30,8 @@ export default function RootLayout({
           >
             <strong>Tuneamatic</strong>
             <nav style={{ display: "flex", gap: "1rem" }}>
-              <a href="/">Generate</a>
-              <a href="/history">Library</a>
+              <Link href="/">Generate</Link>
+              <Link href="/history">Library</Link>
             </nav>
           </header>
           <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem 1rem" }}>

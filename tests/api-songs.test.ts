@@ -43,7 +43,7 @@ describe("GET /api/songs/[id]", () => {
       lmModel: "acestep-5Hz-lm-1.7B",
     });
     const req = new Request(`http://localhost:5433/api/songs/${id}`);
-    const res = await getSong(req, { params: { id } });
+    const res = await getSong(req, { params: Promise.resolve({ id }) });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.status).toBe("ready");
@@ -52,7 +52,7 @@ describe("GET /api/songs/[id]", () => {
 
   it("returns 404 for missing song", async () => {
     const req = new Request("http://localhost:5433/api/songs/nope");
-    const res = await getSong(req, { params: { id: "nope" } });
+    const res = await getSong(req, { params: Promise.resolve({ id: "nope" }) });
     expect(res.status).toBe(404);
   });
 });
@@ -62,7 +62,7 @@ describe("DELETE /api/songs/[id]", () => {
     const db = getDb();
     const id = insertSong(db, { taskId: "t1", title: "", prompt: "p", lyrics: "", advanced: {} });
     const req = new Request(`http://localhost:5433/api/songs/${id}`, { method: "DELETE" });
-    const res = await deleteSong(req, { params: { id } });
+    const res = await deleteSong(req, { params: Promise.resolve({ id }) });
     expect(res.status).toBe(204);
     const list = await listSongs();
     expect((await list.json())).toHaveLength(0);
@@ -70,7 +70,7 @@ describe("DELETE /api/songs/[id]", () => {
 
   it("returns 404 for missing song", async () => {
     const req = new Request("http://localhost:5433/api/songs/nope", { method: "DELETE" });
-    const res = await deleteSong(req, { params: { id: "nope" } });
+    const res = await deleteSong(req, { params: Promise.resolve({ id: "nope" }) });
     expect(res.status).toBe(404);
   });
 });
@@ -81,7 +81,7 @@ describe("DELETE /api/songs/[id] origin guard", () => {
       method: "DELETE",
       headers: { Origin: "http://evil.example", Host: "localhost:5433" },
     });
-    const res = await deleteSong(req, { params: { id: "xyz" } });
+    const res = await deleteSong(req, { params: Promise.resolve({ id: "xyz" }) });
     expect(res.status).toBe(403);
   });
 
@@ -89,7 +89,7 @@ describe("DELETE /api/songs/[id] origin guard", () => {
     const req = new Request("http://localhost:5433/api/songs/xyz", {
       method: "DELETE",
     });
-    const res = await deleteSong(req, { params: { id: "xyz" } });
+    const res = await deleteSong(req, { params: Promise.resolve({ id: "xyz" }) });
     expect(res.status).not.toBe(403); // 404 — id doesn't exist
   });
 });
@@ -120,7 +120,7 @@ describe("GET /api/audio/[id] range parsing", () => {
       new Request("http://localhost:5433/api/audio/" + testId, {
         headers: { Range: "bytes=-100" },
       }),
-      { params: { id: testId } }
+      { params: Promise.resolve({ id: testId }) }
     );
     expect(res.status).toBe(206);
     expect(res.headers.get("Content-Range")).toBe("bytes 900-999/1000");
@@ -132,7 +132,7 @@ describe("GET /api/audio/[id] range parsing", () => {
       new Request("http://localhost:5433/api/audio/" + testId, {
         headers: { Range: "bytes=0-99999" },
       }),
-      { params: { id: testId } }
+      { params: Promise.resolve({ id: testId }) }
     );
     expect(res.status).toBe(206);
     expect(res.headers.get("Content-Range")).toBe("bytes 0-999/1000");
@@ -144,7 +144,7 @@ describe("GET /api/audio/[id] range parsing", () => {
       new Request("http://localhost:5433/api/audio/" + testId, {
         headers: { Range: "bytes=5000-6000" },
       }),
-      { params: { id: testId } }
+      { params: Promise.resolve({ id: testId }) }
     );
     expect(res.status).toBe(416);
     expect(res.headers.get("Content-Range")).toBe("bytes */1000");
@@ -155,7 +155,7 @@ describe("GET /api/audio/[id] range parsing", () => {
       new Request("http://localhost:5433/api/audio/" + testId, {
         headers: { Range: "bytes=abc" },
       }),
-      { params: { id: testId } }
+      { params: Promise.resolve({ id: testId }) }
     );
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Length")).toBe("1000");

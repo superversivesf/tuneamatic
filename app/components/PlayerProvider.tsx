@@ -4,7 +4,7 @@ import type { SongApiResponse } from "@/lib/types";
 
 interface PlayerContextValue {
   song: SongApiResponse | null;
-  audioRef: React.RefObject<HTMLAudioElement>;
+  audioRef: React.RefObject<HTMLAudioElement | null>;
   load: (song: SongApiResponse) => void;
   clear: () => void;
 }

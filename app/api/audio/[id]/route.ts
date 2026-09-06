@@ -8,10 +8,11 @@ import { getStorageDir } from "@/lib/storage";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Response> {
+  const { id } = await params;
   const db = getDb();
-  const song = getSong(db, params.id);
+  const song = getSong(db, id);
   if (!song || song.status !== "ready" || !song.audioPath) {
     return NextResponse.json({ error: "audio not available" }, { status: 404 });
   }

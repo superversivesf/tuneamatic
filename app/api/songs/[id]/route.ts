@@ -9,23 +9,25 @@ import { getStorageDir } from "@/lib/storage";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Response> {
+  const { id } = await params;
   const db = getDb();
-  const song = getSong(db, params.id);
+  const song = getSong(db, id);
   if (!song) return NextResponse.json({ error: "not found" }, { status: 404 });
   return NextResponse.json(toApiResponse(song));
 }
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Response> {
   if (!isSameOrigin(req)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
+  const { id } = await params;
   const db = getDb();
-  const song = getSong(db, params.id);
+  const song = getSong(db, id);
   if (!song) return NextResponse.json({ error: "not found" }, { status: 404 });
   if (song.audioPath) {
     try {
@@ -34,6 +36,6 @@ export async function DELETE(
       /* best-effort */
     }
   }
-  deleteSong(db, params.id);
+  deleteSong(db, id);
   return new NextResponse(null, { status: 204 });
 }
